@@ -1,0 +1,38 @@
+site_name: THUNDER
+repo_name: MICS-Lab/thunder
+site_url: https://mics-lab.github.io/thunder
+
+plugins:
+  - mkdocstrings
+
+nav:
+  - Home: index.md
+  - Tutorials:
+    - Getting Started: getting_started.md
+    - Benchmark a Custom Model: custom_model.md
+    - Overriding Configurations: custom_config.md
+  - API: api.md
+
+theme: 
+  name: material
+  logo: logo.svg
+  favicon: logo.svg
+  palette:
+    primary: deep purple
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_root_heading: true
+            heading_level: 3
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  
+extra_css:
+  - stylesheets/extra.css

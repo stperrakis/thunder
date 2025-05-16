@@ -1,0 +1,32 @@
+import os
+from typing import Optional
+from omegaconf import OmegaConf, DictConfig
+from hydra import initialize, compose
+
+
+def get_config(
+    task: Optional[str] = None,
+    checkpoint: Optional[str] = None,
+    dataset: Optional[str] = None,
+    pretrained_model: Optional[str] = None,
+    adaptation: Optional[str] = None,
+    data_loading_type: Optional[str] = None,
+    wandb_mode: Optional[str] = None,
+    **kwargs,
+) -> DictConfig:
+    params = {
+        "adaptation": adaptation,
+        "ckpt_saving": checkpoint,
+        "dataset": dataset,
+        "data_loading": data_loading_type,
+        "pretrained_model": pretrained_model,
+        "task": task,
+        "wandb": wandb_mode,
+    }
+
+    overrides = [f"+{k}={v}" for k, v in params.items() if v is not None]
+    overrides += [f"++{k}={v}" for k, v in kwargs.items() if v is not None]
+    with initialize(version_base=None, config_path="../config"):
+        cfg = compose(config_name="config", overrides=overrides)
+
+    return cfg
