@@ -13,10 +13,10 @@ compatible_tasks:
     "adversarial_attack",
   ]
 
-nb_train_samples: 50413
-nb_val_samples: 12906
+nb_train_samples: 49562
+nb_val_samples: 13757
 nb_test_samples: 14988
-md5sum: "5d91551c7b0a4d82639411fcc2af847e"
+md5sum: "5d1aab1441a442b1cc4a6ed6c14d4718"
 image_sizes: [[224, 224]]
 mpp: 0.5
 cancer_type: skin
