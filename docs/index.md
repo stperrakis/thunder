@@ -99,6 +99,10 @@ pip install . # install the package
 |ESCA                | esca               | Classif. | 11          | Oeso.    | 256x256     | 10x          | 367,229    |
 |MHIST               | mhist              | Classif. | 2           | CRC      | 224x224     | 5x           | 3,152      |
 |Patch Camelyon      | patch_camelyon     | Classif. | 2           | Breast   | 96x96       | 10x          | 327,680    |
+|SPIDER-Breast       | spider_breast      | Classif. | 18          | Breast   | 224x224     | 20x          | 92,892     |
+|SPIDER-Colorectal   | spider_colorectal  | Classif. | 13          | CRC      | 224x224     | 20x          | 77,182     |
+|SPIDER-Skin         | spider_skin        | Classif. | 24          | Skin     | 224x224     | 20x          | 159,854    |
+|SPIDER-Thorax       | spider_thoarx      | Classif. | 14          | Thorax   | 224x224     | 20x          | 78,307     |
 |TCGA CRC-MSI        | tcga_crc_msi       | Classif. | 2           | CRC      | 512x512     | 20x          | 51,918     |
 |TCGA TILS           | tcga_tils          | Classif. | 2           | Multi    | 100x100     | 20x          | 304,097    |
 |TCGA Uniform        | tcga_uniform       | Classif. | 32          | Multi    | 256x256     | 20x          | 271,170    |
