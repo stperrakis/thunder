@@ -97,6 +97,17 @@ def create_splits_spider_thorax(base_folder: str, dataset_cfg: dict) -> None:
     val_slide_names = random.sample(
         unique_slide_names, int(0.2 * len(unique_slide_names))
     )
+
+    # Class 12 is only present on 4 slides in the spider_thorax dataset
+    # (significantly less represented than other classes)
+    # so we need to make sure to have one in val set and the 3 others in train set
+    for slide_name in ["slide_0021", "slide_0048", "slide_0123", "slide_0178"]:
+        # Looping over the only 4 slides containing class 12 samples
+        if slide_name != "slide_0048" and slide_name in val_slide_names:
+            val_slide_names.remove(slide_name)
+        elif slide_name == "slide_0048" and slide_name not in val_slide_names:
+            val_slide_names.append(slide_name)
+
     val_mask = np.array([slide_name in val_slide_names for slide_name in slide_names])
 
     (
