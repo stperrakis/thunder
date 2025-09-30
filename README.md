@@ -13,11 +13,23 @@
 
 </div>
 
+<div align="center">
+
+**Published at NeurIPS 2025 Datasets and Benchmarks Track (Spotlight)**
+
+</div>
+
 We introduce **THUNDER**, a comprehensive benchmark designed to rigorously compare foundation models across various downstream tasks in computational pathology. THUNDER enables the evaluation and analysis of feature representations, robustness, and uncertainty quantification of these models across different datasets. Our benchmark encompasses a diverse collection of well-established datasets, covering multiple cancer types, image magnifications, and varying image and sample sizes. We propose an extensive set of tasks aimed at thoroughly assessing the capabilities and limitations of foundation models in digital pathology.
 
 &#9889; **Paper**: [THUNDER: Tile-level Histopathology image UNDERstanding benchmark](https://arxiv.org/abs/2507.07860)\
 &#9889; **Homepage/Documentation**: [THUNDER docs](https://mics-lab.github.io/thunder/)\
-&#9889; **Leaderboard**: [THUNDER leaderboard](https://mics-lab.github.io/thunder/leaderboard/)
+&#9889; **Leaderboards**: [THUNDER leaderboards](https://mics-lab.github.io/thunder/leaderboards/)
+
+## News
+
+* **2025-09-30**: Patch-level SPIDER datasets have been integrated into THUNDER. See the dedicated SPIDER leaderboard [here](https://mics-lab.github.io/thunder/leaderboards/).
+* **2025-09-18**: THUNDER was accepted to **NeurIPS 2025 Datasets & Benchmarks Track** as a **Spotlight** presentation!
+
 
 ## Overview
 
@@ -131,3 +143,17 @@ If you want to use the CONCH and MUSK models, you should install them as follows
 pip install git+https://github.com/Mahmoodlab/CONCH.git # CONCH
 pip install git+https://github.com/lilab-stanford/MUSK.git # MUSK
 ```
+
+## Citation
+```
+@article{marza2025thunder,
+  title={THUNDER: Tile-level Histopathology image UNDERstanding benchmark},
+  author={Marza, Pierre and Fillioux, Leo and Boutaj, Sofi{\`e}ne and Mahatha, Kunal and Desrosiers, Christian and Piantanida, Pablo and Dolz, Jose and Christodoulidis, Stergios and Vakalopoulou, Maria},
+  journal={Neural Information Processing Systems (NeurIPS) D&B Track},
+  year={2025}
+}
+```
+
+## Acknowledgments
+This work has been partially supported by *ANR-23-IAHU-0002*, *ANR-21-CE45-0007*, *ANR-23-CE45-0029*, and the *Health Data Hub (HDH)* as part of the second edition of the *France-Québec* call for projects *Intelligence Artificielle en santé*. It was performed using computational resources from the *Mésocentre* computing center of *Université Paris-Saclay*, *CentraleSupélec* and *École Normale Supérieure Paris-Saclay* supported by *CNRS* and *Région Île-de-France*, and from *GENCI-IDRIS*
+(Grant *2025-AD011016068*).
