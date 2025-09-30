@@ -1,11 +1,12 @@
 ---
-title: Rank-sum Leaderboard
+title: Leaderboards
 ---
 
 # 🏆 Rank-sum Leaderboard
 
 ### Updates
 * **2025-09-01**: Segmentation results were updated (small changes based on improved performance for all models on the *ocelot* dataset only -> [Related commit](https://github.com/MICS-Lab/thunder/commit/5f6d6e7cdd6a1df5affed2dac47233f80ce5a205)). Segmentation and global rankings do no thus match exactly (a few small differences only) Table 4 from the current version of our [arXiv paper](https://arxiv.org/abs/2507.07860). The paper will be updated soon.
+* **2025-09-30**: Four SPIDER datasets have been integrated into thunder. Results associated to them have not been integrated into this rank-sum leaderboard (only datasets presented in our [arXiv paper](https://arxiv.org/abs/2507.07860) are aggregated in the rank-sum learderboard), but we have instead created a leaderboard dedicated to SPIDER datasets below.
 
 <div class="table-responsive-sm">
   <table id="rankTable" class="table table-hover table-bordered table-sm nowrap">
@@ -55,6 +56,14 @@ title: Rank-sum Leaderboard
 ---
 
 # 🏆 Spider Leaderboard
+
+The considered datasets are:
+
+* *Br*: [SPIDER-Breast](https://huggingface.co/datasets/histai/SPIDER-breast)
+* *Co*: [SPIDER-Colorectal](https://huggingface.co/datasets/histai/SPIDER-colorectal)
+* *Sk*: [SPIDER-skin](https://huggingface.co/datasets/histai/SPIDER-skin)
+* *Th*: [SPIDER-thorax](https://huggingface.co/datasets/histai/SPIDER-thorax)
+
 <div class="table-responsive-sm">
     <table id="rankTable2" class="table table-hover table-bordered table-sm nowrap">
         <caption>Performance of founcation models on the SPIDER datasets</caption>
