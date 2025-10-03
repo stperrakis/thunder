@@ -184,6 +184,9 @@ def get_model(model_cfg: dict, device: str):
         "phikon2",
         "dinov2base",
         "dinov2large",
+        "dinov3small",
+        "dinov3",
+        "dinov3large",
         "vitbasepatch16224in21k",
         "vitlargepatch16224in21k",
     ]:
@@ -283,6 +286,9 @@ def get_model_from_name(model_name: str, device: str):
         * musk
         * dinov2base
         * dinov2large
+        * dinov3small
+        * dinov3base
+        * dinov3large
         * vitbasepatch16224in21k
         * vitlargepatch16224in21k
         * clipvitbasepatch32
@@ -383,7 +389,7 @@ def get_from_safetensors(ckpt_path: str):
     model = AutoModel.from_pretrained(ckpt_path)
 
     # Transform
-    processor = AutoImageProcessor.from_pretrained(ckpt_path, use_fast=False)
+    processor = AutoImageProcessor.from_pretrained(ckpt_path, use_fast=True)
 
     def transform(im):
         return processor(im, return_tensors="pt")["pixel_values"].squeeze(0)

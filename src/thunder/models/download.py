@@ -103,6 +103,18 @@ TAGS_FILENAMES = {
         "openai/clip-vit-large-patch14",
         "model.safetensors",
     ),  # CLIP-L (https://huggingface.co/openai/clip-vit-large-patch14)
+    "dinov3small": (
+        "facebook/dinov3-vits16-pretrain-lvd1689m",
+        "model.safetensors",
+    ),  # DINOv3-S (https://huggingface.co/facebook/dinov3-vits16-pretrain-lvd1689m)
+    "dinov3base": (
+        "facebook/dinov3-vitb16-pretrain-lvd1689m",
+        "model.safetensors",
+    ),  # DINOv3-B (https://huggingface.co/facebook/dinov3-vitb16-pretrain-lvd1689m)
+    "dinov3large": (
+        "facebook/dinov3-vitl16-pretrain-lvd1689m",
+        "model.safetensors",
+    ),  # DINOv3-L (https://huggingface.co/facebook/dinov3-vitl16-pretrain-lvd1689m)
 }
 
 
@@ -129,6 +141,9 @@ def download_models(models: Union[List[str], str]) -> None:
         * musk
         * dinov2base
         * dinov2large
+        * dinov3small
+        * dinov3base
+        * dinov3large
         * vitbasepatch16224in21k
         * vitlargepatch16224in21k
         * clipvitbasepatch32
