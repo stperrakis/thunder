@@ -1,5 +1,6 @@
 model_name: uni2h
 type: timm
+vlm: false
 emb_dim: 1536
 ckpt_path: ${oc.env:THUNDER_BASE_DATA_FOLDER}/pretrained_ckpts/uni2h/pytorch_model.bin
 hf_tag: hf-hub:MahmoodLab/UNI2-h

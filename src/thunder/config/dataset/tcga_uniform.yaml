@@ -1,7 +1,7 @@
 dataset_name: tcga_uniform
 nb_classes: 32
 base_data_folder: ${oc.env:THUNDER_BASE_DATA_FOLDER}/datasets/
-compatible_tasks: ["adversarial_attack", "alignment_scoring", "image_retrieval", "knn", "linear_probing", "pre_computing_embeddings", "simple_shot", "transformation_invariance"]
+compatible_tasks: ["adversarial_attack", "alignment_scoring", "image_retrieval", "knn", "linear_probing", "pre_computing_embeddings", "simple_shot", "transformation_invariance", "zero_shot_vlm"]
 nb_train_samples: 170840
 nb_val_samples: 44670
 nb_test_samples: 56200
@@ -109,3 +109,36 @@ id_to_class:
   29: Uterine_Carcinosarcoma
   30: Uterine_Corpus_Endometrial_Carcinoma
   31: Uveal_Melanoma
+id_to_classname:
+  0: adrenocortical carcinoma
+  1: bladder urothelial carcinoma
+  2: brain lower grade glioma
+  3: breast invasive carcinoma
+  4: cervical squamous cell carcinoma and endocervical adenocarcinoma
+  5: cholangiocarcinoma
+  6: colon adenocarcinoma
+  7: esophageal carcinoma
+  8: elioblastoma multiforme
+  9: head and neck squamous cell carcinoma
+  10: kidney chromophobe
+  11: kidney renal clear cell carcinoma
+  12: kidney renal papillary cell carcinoma
+  13: liver hepatocellular carcinoma
+  14: lung adenocarcinoma
+  15: lung squamous cell carcinoma
+  16: lymphoid neoplasm diffuse large B-cell lymphoma
+  17: mesothelioma
+  18: ovarian serous cystadenocarcinoma
+  19: pancreatic adenocarcinoma
+  20: Pheochromocytoma_and_Paraganglioma
+  21: prostate adenocarcinoma
+  22: rectum adenocarcinoma
+  23: sarcoma
+  24: skin cutaneous melanoma
+  25: stomach adenocarcinoma
+  26: testicular germ cell tumors
+  27: thymoma
+  28: thyroid carcinoma
+  29: uterine carcinosarcoma
+  30: uterine corpus endometrial carcinoma
+  31: uveal melanoma

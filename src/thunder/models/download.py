@@ -163,12 +163,33 @@ def download_model(model: str) -> None:
 
         if filename == "model.safetensors" or (
             filename == "pytorch_model.bin"
-            and local_dir_tag in ["clipvitbasepatch32", "quiltnetb32", "plip"]
+            and local_dir_tag
+            in ["clipvitbasepatch32", "clipvitlargepatch14", "quiltnetb32", "plip"]
         ):
             if local_dir_tag == "keep":
-                extra_files = ["config.json", "modeling_keep.py"]
+                extra_files = [
+                    "config.json",
+                    "modeling_keep.py",
+                    "tokenizer_config.json",
+                    "vocab.txt",
+                ]
             elif local_dir_tag == "musk":
                 extra_files = []
+            elif local_dir_tag in [
+                "clipvitbasepatch32",
+                "clipvitlargepatch14",
+                "plip",
+                "quiltnetb32",
+            ]:
+                extra_files = [
+                    "config.json",
+                    "preprocessor_config.json",
+                    "special_tokens_map.json",
+                    "tokenizer_config.json",
+                    "tokenizer.json",
+                ]
+                if local_dir_tag != "plip":
+                    extra_files.extend(["merges.txt", "vocab.json"])
             elif local_dir_tag == "midnight":
                 extra_files = ["config.json"]
             elif local_dir_tag == "titan":
@@ -188,6 +209,24 @@ def download_model(model: str) -> None:
             for extra_file in extra_files:
                 hf_hub_download(
                     tag, filename=extra_file, local_dir=local_dir, force_download=True
+                )
+
+        if local_dir_tag == "musk":
+            import subprocess
+
+            # Define the wget command
+            command = [
+                "wget",
+                "https://github.com/lilab-stanford/MUSK/raw/main/musk/models/tokenizer.spm",
+                "--directory-prefix",
+                f"{local_dir}",
+            ]
+            # Execute the command
+            try:
+                subprocess.run(command, check=True)
+            except:
+                raise RuntimeError(
+                    "wget is needed to download MUSK tokenizer config file."
                 )
 
         logging.info(f"Successfully downloaded {filename} from {tag}.")

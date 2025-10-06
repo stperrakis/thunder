@@ -3,6 +3,7 @@ nb_classes: 18
 base_data_folder: ${oc.env:THUNDER_BASE_DATA_FOLDER}/datasets/
 compatible_tasks:
   [
+    "adversarial_attack",
     "alignment_scoring",
     "image_retrieval",
     "knn",
@@ -10,9 +11,8 @@ compatible_tasks:
     "pre_computing_embeddings",
     "simple_shot",
     "transformation_invariance",
-    "adversarial_attack",
+    "zero_shot_vlm",
   ]
-
 nb_train_samples: 67581
 nb_val_samples: 13277
 nb_test_samples: 12034
@@ -79,3 +79,22 @@ id_to_class:
   15: "Sclerosing adenosis"
   16: "Typical ductal hyperplasia"
   17: "Vessels"
+id_to_classname:
+  0: "adenosis"
+  1: "benign phyllodes tumor"
+  2: "ductal carcinoma in situ (high-grade)"
+  3: "ductal carcinoma in situ (low-grade)"
+  4: "fat"
+  5: "fibroadenoma"
+  6: "fibrocystic changes"
+  7: "fibrosis"
+  8: "invasive non-special type carcinoma"
+  9: "lipogranuloma"
+  10: "lobular invasive carcinoma"
+  11: "malignant phyllodes tumor"
+  12: "necrosis"
+  13: "normal ducts"
+  14: "normal lobules"
+  15: "sclerosing adenosis"
+  16: "typical ductal hyperplasia"
+  17: "vessels"

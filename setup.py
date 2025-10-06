@@ -32,6 +32,7 @@ setup(
         "pillow==11.0.0",
         "plotly==6.0.0",
         "scikit-learn==1.6.1",
+        "sentencepiece==0.2.1",
         "tabulate==0.9.0",
         "timm==1.0.13",
         "torch==2.5.1",

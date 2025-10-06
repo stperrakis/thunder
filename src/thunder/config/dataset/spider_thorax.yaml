@@ -3,6 +3,7 @@ nb_classes: 14
 base_data_folder: ${oc.env:THUNDER_BASE_DATA_FOLDER}/datasets/
 compatible_tasks:
   [
+    "adversarial_attack",
     "alignment_scoring",
     "image_retrieval",
     "knn",
@@ -10,9 +11,8 @@ compatible_tasks:
     "pre_computing_embeddings",
     "simple_shot",
     "transformation_invariance",
-    "adversarial_attack",
+    "zero_shot_vlm",
   ]
-
 nb_train_samples: 49562
 nb_val_samples: 13757
 nb_test_samples: 14988
@@ -52,7 +52,6 @@ class_to_id:
   Tumor small cell: 11
   Tumor soft: 12
   Vessel: 13
-  
 id_to_class:
   0: "Aveoli"
   1: "Bronchial cartilage"
@@ -68,3 +67,18 @@ id_to_class:
   11: "Tumor small cell"
   12: "Tumor soft"
   13: "Vessel"
+id_to_classname:
+  0: "aveoli"
+  1: "bronchial cartilage"
+  2: "bronchial glands"
+  3: "chronic inflammation and fibrosis"
+  4: "detritus"
+  5: "fibrosis"
+  6: "hemorrhage"
+  7: "lymph node"
+  8: "pigment"
+  9: "pleura"
+  10: "tumor non-small cell"
+  11: "tumor small cell"
+  12: "tumor soft"
+  13: "vessel"
