@@ -1,5 +1,6 @@
 import os
 from collections.abc import Callable
+from contextlib import nullcontext
 
 import h5py
 import numpy as np
@@ -87,6 +88,17 @@ def pre_computing_patch_embeddings(
             extract_embedding,
             dataset_task_type,
             device,
+            id2classnames=(
+                dict(cfg.dataset.id_to_classname)
+                if dataset_task_type == "linear_probing"
+                and (
+                    cfg.pretrained_model.vlm
+                    if model_cls is None
+                    else pretrained_model.vlm
+                )
+                and split == "test"
+                else None
+            ),
         )
 
 
@@ -98,6 +110,7 @@ def pre_computing_patch_embeddings_split(
     extract_embedding: Callable[[torch.Tensor, ViTModel, str], torch.Tensor],
     task_type: str,
     device: torch.device | str = "cuda",
+    id2classnames: dict = None,
 ) -> None:
     """
     Pre-computing embeddings for each patch in a split of a given dataset with a given pre-trained model.
@@ -108,15 +121,23 @@ def pre_computing_patch_embeddings_split(
     :param extract_embedding: function to extract an embedding vector from an input image with the pretrained model.
     :param task_type: type of task to extract emebddings for (classification, segmentation).
     :param device: device to use (cpu, cuda).
+    :param id2classnames: mapping from class ids to text labels.
     """
     os.makedirs(embeddings_folder, exist_ok=True)
     emb_path = os.path.join(embeddings_folder, "embeddings.h5")
+    text_aligned_emb_path = os.path.join(
+        embeddings_folder, "text_aligned_embeddings.h5"
+    )
     label_path = os.path.join(embeddings_folder, "labels.h5")
 
     # Open / create the files once.
     with h5py.File(emb_path, "a", libver="latest") as emb_h5, h5py.File(
         label_path, "a", libver="latest"
-    ) as lab_h5:
+    ) as lab_h5, (
+        h5py.File(text_aligned_emb_path, "a", libver="latest")
+        if id2classnames is not None
+        else nullcontext()
+    ) as text_aligned_emb_h5:
         next_idx = max((int(k) for k in emb_h5.keys()), default=-1) + 1
 
         for batch in tqdm(dataloader, desc="Extracting patch embeddings"):
@@ -124,8 +145,21 @@ def pre_computing_patch_embeddings_split(
             labels = batch["label"].to(device, non_blocking=True)
 
             embeds = extract_embedding(imgs, pretrained_model, task_type=task_type)
+
             embeds = embeds.cpu().numpy().astype(np.float32, copy=False)
             labels = labels.cpu().numpy().astype(np.int64, copy=False)
+
+            # Text-aligned embeddings (VLM)
+            if text_aligned_emb_h5 is not None:
+                text_aligned_embeds = extract_embedding(
+                    imgs,
+                    pretrained_model,
+                    task_type=task_type,
+                    text_aligned_im_emb=True,
+                )
+                text_aligned_embeds = (
+                    text_aligned_embeds.cpu().numpy().astype(np.float32, copy=False)
+                )
 
             bs = embeds.shape[0]
             for i in range(bs):
@@ -136,6 +170,12 @@ def pre_computing_patch_embeddings_split(
                     data=embeds[i],
                     dtype="float32",
                 )
+                if text_aligned_emb_h5 is not None:
+                    text_aligned_emb_h5.create_dataset(
+                        key,
+                        data=text_aligned_embeds[i],
+                        dtype="float32",
+                    )
                 lab_h5.create_dataset(
                     key,
                     data=labels[i],
@@ -143,3 +183,30 @@ def pre_computing_patch_embeddings_split(
                 )
 
             next_idx += bs
+
+    # Zero-shot image-text embeddings
+    if id2classnames is not None:
+        from ..utils.constants import UtilsConstants
+
+        text_emb_path = os.path.join(embeddings_folder, "text_embeddings.h5")
+        with h5py.File(text_emb_path, "a", libver="latest") as text_emb_h5:
+            next_idx = max((int(k) for k in text_emb_h5.keys()), default=-1) + 1
+            nb_classes = len(list(id2classnames.keys()))
+            for i in range(nb_classes):
+                classname = id2classnames[i]
+                text_prompts = [
+                    template.replace("CLASSNAME", classname)
+                    for template in UtilsConstants.VLM_TEMPLATES.value
+                ]
+                text_embeds = extract_embedding(
+                    text_prompts, pretrained_model, task_type=task_type, text_emb=True
+                )
+                text_embed = text_embeds.mean(dim=0)
+                text_embed = text_embed.cpu().numpy().astype(np.float32, copy=False)
+
+                key = f"{i}"
+                text_emb_h5.create_dataset(
+                    key,
+                    data=text_embed,
+                    dtype="float32",
+                )
