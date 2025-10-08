@@ -165,6 +165,16 @@ def get_model(model_cfg: dict, device: str):
 
             return emb
 
+    elif model_cfg.model_name in ["dinov3small", "dinov3base", "dinov3large"]:
+
+        def extract_embedding(src, pretrained_model, task_type="linear_probing"):
+            out = pretrained_model(src)
+            if task_type == "linear_probing":
+                emb = out.pooler_output
+            else:
+                emb = out.last_hidden_state[:, 1:]
+            return emb
+
     elif model_cfg.model_name in [
         "clipvitbasepatch32",
         "clipvitlargepatch14",
@@ -185,7 +195,7 @@ def get_model(model_cfg: dict, device: str):
         "dinov2base",
         "dinov2large",
         "dinov3small",
-        "dinov3",
+        "dinov3base",
         "dinov3large",
         "vitbasepatch16224in21k",
         "vitlargepatch16224in21k",
@@ -437,8 +447,7 @@ def get_musk(ckpt_path: str):
         raise ImportError(
             "In order to use MUSK, please run the following: 'pip install git+https://github.com/lilab-stanford/MUSK.git'"
         )
-    from timm.data.constants import (IMAGENET_INCEPTION_MEAN,
-                                     IMAGENET_INCEPTION_STD)
+    from timm.data.constants import IMAGENET_INCEPTION_MEAN, IMAGENET_INCEPTION_STD
     from torchvision import transforms
 
     # Model
