@@ -499,5 +499,3 @@ def get_titan(ckpt_path: str):
 
     return model, transform
     
-    
-    
