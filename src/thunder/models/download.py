@@ -213,4 +213,3 @@ def download_model(model: str) -> None:
         logging.error(f"Failed to download {filename} from {tag}. Error: {e}")
         traceback.print_exc()
         
-        
