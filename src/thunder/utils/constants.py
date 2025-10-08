@@ -63,4 +63,3 @@ class DatasetConstants(Enum):
 
 class UtilsConstants(Enum):
     DEFAULT_SEED = 0
-
