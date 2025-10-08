@@ -610,6 +610,5 @@ def get_titan(ckpt_path: str):
     # Model
     titan = AutoModel.from_pretrained("MahmoodLab/TITAN", trust_remote_code=True)
     model, transform = titan.return_conch()
-
     return model, transform
     
