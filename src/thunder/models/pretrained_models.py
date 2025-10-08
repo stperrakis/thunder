@@ -498,4 +498,3 @@ def get_titan(ckpt_path: str):
     model, transform = titan.return_conch()
 
     return model, transform
-    
