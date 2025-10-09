@@ -165,7 +165,11 @@ def get_model(model_cfg: dict, device: str):
 
             return emb
 
-    elif model_cfg.model_name in ["dinov3small", "dinov3base", "dinov3large"]:
+    elif model_cfg.model_name in [
+        "dinov3vits16pretrainlvd1689m",
+        "dinov3vitb16pretrainlvd1689m",
+        "dinov3vitl16pretrainlvd1689m",
+    ]:
 
         def extract_embedding(src, pretrained_model, task_type="linear_probing"):
             out = pretrained_model(src)
@@ -194,9 +198,9 @@ def get_model(model_cfg: dict, device: str):
         "phikon2",
         "dinov2base",
         "dinov2large",
-        "dinov3small",
-        "dinov3base",
-        "dinov3large",
+        "dinov3vits16pretrainlvd1689m",
+        "dinov3vitb16pretrainlvd1689m",
+        "dinov3vitl16pretrainlvd1689m",
         "vitbasepatch16224in21k",
         "vitlargepatch16224in21k",
     ]:
@@ -296,9 +300,9 @@ def get_model_from_name(model_name: str, device: str):
         * musk
         * dinov2base
         * dinov2large
-        * dinov3small
-        * dinov3base
-        * dinov3large
+        * dinov3vits16pretrainlvd1689m
+        * dinov3vitb16pretrainlvd1689m
+        * dinov3vitl16pretrainlvd1689m
         * vitbasepatch16224in21k
         * vitlargepatch16224in21k
         * clipvitbasepatch32
