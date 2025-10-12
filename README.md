@@ -148,7 +148,7 @@ pip install git+https://github.com/lilab-stanford/MUSK.git # MUSK
 ## Citation
 ```
 @article{marza2025thunder,
-  title={THUNDER: Tile-level Histopathology image UNDERstanding benchmark},
+  title={{THUNDER}: Tile-level Histopathology image UNDERstanding benchmark},
   author={Marza, Pierre and Fillioux, Leo and Boutaj, Sofi{\`e}ne and Mahatha, Kunal and Desrosiers, Christian and Piantanida, Pablo and Dolz, Jose and Christodoulidis, Stergios and Vakalopoulou, Maria},
   journal={Neural Information Processing Systems (NeurIPS) D&B Track},
   year={2025}
