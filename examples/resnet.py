@@ -13,6 +13,7 @@ class Resnet18Features(PretrainedModel):
 
         self.name = "resnet18"
         self.emb_dim = 512
+        self.vlm = False
 
         self.feature_maps = torch.nn.Sequential(
             resnet.conv1,

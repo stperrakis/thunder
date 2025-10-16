@@ -11,6 +11,7 @@ import torch
 import wandb
 from omegaconf import DictConfig, OmegaConf
 
+import sys
 
 def print_task_hyperparams(cfg: DictConfig, custom_name: Optional[str] = None) -> None:
     """
@@ -20,13 +21,16 @@ def print_task_hyperparams(cfg: DictConfig, custom_name: Optional[str] = None) -
     If `custom_name` is provided, it will be used instead of
     cfg.pretrained_model.model_name.
     """
-    RESET = "\033[0m"
-    BOLD = "\033[1m"
-    UNDERLINE = "\033[4m"
-    BLUE = "\033[34m"
-    WHITE = "\033[37m"
-    GREEN = "\033[32m"
-    RED = "\033[31m"
+
+    use_colors = sys.stdout.isatty()
+
+    RESET = "\033[0m" if use_colors else ""
+    BOLD = "\033[1m" if use_colors else ""
+    UNDERLINE = "\033[4m" if use_colors else ""
+    BLUE = "\033[34m" if use_colors else ""
+    WHITE = "\033[37m" if use_colors else ""
+    GREEN = "\033[32m" if use_colors else ""
+    RED = "\033[31m" if use_colors else ""
 
     task = cfg.task.type
     dataset_name = cfg.dataset.dataset_name

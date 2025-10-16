@@ -27,6 +27,7 @@ We introduce **THUNDER**, a comprehensive benchmark designed to rigorously compa
 
 ## News
 
+* **2025-10-06**: As requested (https://github.com/MICS-Lab/thunder/issues/1), a new *zero-shot classification* task to evaluate VLMs was included into THUNDER. Example command: `thunder benchmark keep spider_breast zero_shot_vlm`. See the dedicated zero-shot classification leaderboard [here](https://mics-lab.github.io/thunder/leaderboards/).
 * **2025-09-30**: Patch-level SPIDER datasets have been integrated into THUNDER. See the dedicated SPIDER leaderboard [here](https://mics-lab.github.io/thunder/leaderboards/).
 * **2025-09-18**: THUNDER was accepted to **NeurIPS 2025 Datasets & Benchmarks Track** as a **Spotlight** presentation!
 
@@ -147,7 +148,7 @@ pip install git+https://github.com/lilab-stanford/MUSK.git # MUSK
 ## Citation
 ```
 @article{marza2025thunder,
-  title={THUNDER: Tile-level Histopathology image UNDERstanding benchmark},
+  title={{THUNDER}: Tile-level Histopathology image UNDERstanding benchmark},
   author={Marza, Pierre and Fillioux, Leo and Boutaj, Sofi{\`e}ne and Mahatha, Kunal and Desrosiers, Christian and Piantanida, Pablo and Dolz, Jose and Christodoulidis, Stergios and Vakalopoulou, Maria},
   journal={Neural Information Processing Systems (NeurIPS) D&B Track},
   year={2025}

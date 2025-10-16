@@ -6,7 +6,7 @@ import torch
 from omegaconf import DictConfig, OmegaConf
 from timm.data import resolve_data_config
 from timm.data.transforms_factory import create_transform
-from transformers import AutoImageProcessor, AutoModel
+from transformers import AutoImageProcessor, AutoModel, AutoTokenizer
 
 from ..utils.constants import ModelConstants
 
@@ -106,14 +106,14 @@ def get_model(model_cfg: dict, device: str):
             timm_kwargs["act_layer"] = torch.nn.SiLU
 
         if model_cfg.model_name == "musk":
-            model, transform = get_musk(model_cfg.ckpt_path)
+            model, transform, tokenizer = get_musk(model_cfg.ckpt_path)
         else:
             model, transform = get_from_timm(
                 model_cfg.hf_tag, timm_kwargs, model_cfg.ckpt_path, device
             )
     elif model_cfg.type == "safetensors":
         if model_cfg.model_name == "keep":
-            model, transform = get_keep(model_cfg.ckpt_path)
+            model, transform, tokenizer = get_keep(model_cfg.ckpt_path)
         elif model_cfg.model_name == "titan":
             model, transform = get_titan(model_cfg.ckpt_path)
         elif model_cfg.model_name == "midnight":
@@ -123,17 +123,36 @@ def get_model(model_cfg: dict, device: str):
                 model_cfg.ckpt_path, use_fast="dinov3" in model_cfg.model_name
             )
     elif model_cfg.type == "open_clip":
-        model, transform = get_from_open_clip(model_cfg.ckpt_path)
+        model, transform, tokenizer = get_from_open_clip(model_cfg.ckpt_path)
     else:
-        raise ValueError(f"Unkown model type {model_cfg.type} specified in yaml file.")
+        raise ValueError(f"Unknown model type {model_cfg.type} specified in yaml file.")
 
     if model_cfg.model_name == "conch":
 
-        def extract_embedding(src, pretrained_model, task_type="linear_probing"):
+        def extract_embedding(
+            src,
+            pretrained_model,
+            task_type="linear_probing",
+            text_aligned_im_emb=False,
+            text_emb=False,
+            tokenizer=tokenizer,
+            device=device,
+        ):
             if task_type == "linear_probing":
-                emb = pretrained_model.encode_image(
-                    src, proj_contrast=False, normalize=False
-                )
+                if not text_aligned_im_emb and not text_emb:
+                    emb = pretrained_model.encode_image(
+                        src, proj_contrast=False, normalize=False
+                    )
+                else:
+                    if not text_emb:
+                        emb = pretrained_model.encode_image(
+                            src, proj_contrast=True, normalize=True
+                        )
+                    else:
+                        from conch.open_clip_custom import tokenize
+
+                        tokenized_prompts = tokenize(tokenizer, src).to(device)
+                        emb = pretrained_model.encode_text(tokenized_prompts)
             else:
                 emb = pretrained_model.visual.trunk(
                     src, **pretrained_model.visual.trunk_kwargs
@@ -142,26 +161,88 @@ def get_model(model_cfg: dict, device: str):
 
     elif model_cfg.model_name == "keep":
 
-        def extract_embedding(src, pretrained_model, task_type="linear_probing"):
+        def extract_embedding(
+            src,
+            pretrained_model,
+            task_type="linear_probing",
+            text_aligned_im_emb=False,
+            text_emb=False,
+            tokenizer=tokenizer,
+            device=device,
+        ):
             if task_type == "linear_probing":
-                emb = pretrained_model.encode_image(src)
+                if not text_emb:
+                    emb = pretrained_model.encode_image(src)
+                else:
+                    tokenized_prompts = tokenizer(
+                        src,
+                        max_length=256,
+                        padding="max_length",
+                        truncation=True,
+                        return_tensors="pt",
+                    ).to(device)
+                    emb = model.encode_text(tokenized_prompts)
             else:
                 emb = pretrained_model.visual.forward_features(src)[:, 1:]
             return emb
 
     elif model_cfg.model_name == "musk":
 
-        def extract_embedding(src, pretrained_model, task_type="linear_probing"):
+        def extract_embedding(
+            src,
+            pretrained_model,
+            task_type="linear_probing",
+            text_aligned_im_emb=False,
+            text_emb=False,
+            tokenizer=tokenizer,
+            device=device,
+        ):
             if task_type == "linear_probing":
-                emb = pretrained_model(
-                    image=src,
-                    with_head=False,
-                    out_norm=False,
-                    ms_aug=True,
-                    return_global=True,
-                )[
-                    0
-                ]  # keeping only vision_cls
+                if not text_aligned_im_emb and not text_emb:
+                    emb = pretrained_model(
+                        image=src,
+                        with_head=False,
+                        out_norm=False,
+                        ms_aug=True,
+                        return_global=True,
+                    )[
+                        0
+                    ]  # keeping only vision_cls
+                else:
+                    if not text_emb:
+                        emb = pretrained_model(
+                            image=src,
+                            with_head=True,
+                            out_norm=True,
+                            ms_aug=False,
+                            return_global=True,
+                        )[
+                            0
+                        ]  # keeping only vision_cls
+                    else:
+                        from musk import utils
+
+                        text_ids = []
+                        paddings = []
+                        for txt in src:
+                            txt_ids, pad = utils.xlm_tokenizer(
+                                txt, tokenizer, max_len=100
+                            )
+                            text_ids.append(torch.tensor(txt_ids).unsqueeze(0))
+                            paddings.append(torch.tensor(pad).unsqueeze(0))
+                        text_ids = torch.cat(text_ids)
+                        paddings = torch.cat(paddings)
+
+                        emb = model(
+                            text_description=text_ids.to(device),
+                            padding_mask=paddings.to(device),
+                            with_head=True,
+                            out_norm=True,
+                            ms_aug=False,
+                            return_global=True,
+                        )[
+                            1
+                        ]  # keeping only text_cls
             else:
                 emb = pretrained_model.beit3(visual_tokens=src)["encoder_out"][:, 1:]
 
@@ -174,9 +255,23 @@ def get_model(model_cfg: dict, device: str):
         "quiltnetb32",
     ]:
 
-        def extract_embedding(src, pretrained_model, task_type="linear_probing"):
+        def extract_embedding(
+            src,
+            pretrained_model,
+            task_type="linear_probing",
+            text_aligned_im_emb=False,
+            text_emb=False,
+            tokenizer=tokenizer,
+            device=device,
+        ):
             if task_type == "linear_probing":
-                emb = pretrained_model.get_image_features(src)
+                if not text_emb:
+                    emb = pretrained_model.get_image_features(src)
+                else:
+                    tokenized_prompts = tokenizer(
+                        src, padding=True, return_tensors="pt"
+                    ).to(device)
+                    emb = model.get_text_features(**tokenized_prompts)
             else:
                 emb = pretrained_model.vision_model(src).last_hidden_state[:, 1:]
             return emb
@@ -372,15 +467,19 @@ def get_from_open_clip(ckpt_path: str):
     :param ckpt_path: path to the stored checkpoint.
     """
     try:
-        from conch.open_clip_custom import create_model_from_pretrained
+        from conch.open_clip_custom import create_model_from_pretrained, get_tokenizer
     except ImportError:
         raise ImportError(
             "In order to use CONCH, please run the following: 'pip install git+https://github.com/Mahmoodlab/CONCH.git'"
         )
 
+    # Model and transform
     model, transform = create_model_from_pretrained("conch_ViT-B-16", ckpt_path)
 
-    return model, transform
+    # Tokenizer
+    tokenizer = get_tokenizer()
+
+    return model, transform, tokenizer
 
 
 def get_from_safetensors(ckpt_path: str, use_fast: str = False):
@@ -403,7 +502,18 @@ def get_from_safetensors(ckpt_path: str, use_fast: str = False):
     def transform(im):
         return processor(im, return_tensors="pt")["pixel_values"].squeeze(0)
 
-    return model, transform
+    # Tokenizer
+    if (
+        "clipvitbasepatch32" in ckpt_path
+        or "clipvitlargepatch14" in ckpt_path
+        or "plip" in ckpt_path
+        or "quiltnetb32" in ckpt_path
+    ):
+        tokenizer = AutoTokenizer.from_pretrained(ckpt_path)
+    else:
+        tokenizer = None
+
+    return model, transform, tokenizer
 
 
 def get_keep(ckpt_path: str):
@@ -430,7 +540,10 @@ def get_keep(ckpt_path: str):
         ]
     )
 
-    return model, transform
+    # Tokenizer
+    tokenizer = AutoTokenizer.from_pretrained(ckpt_path, trust_remote_code=True)
+
+    return model, transform, tokenizer
 
 
 def get_musk(ckpt_path: str):
@@ -446,8 +559,11 @@ def get_musk(ckpt_path: str):
         raise ImportError(
             "In order to use MUSK, please run the following: 'pip install git+https://github.com/lilab-stanford/MUSK.git'"
         )
+    import os
+
     from timm.data.constants import IMAGENET_INCEPTION_MEAN, IMAGENET_INCEPTION_STD
     from torchvision import transforms
+    from transformers import XLMRobertaTokenizer
 
     # Model
     model = timm.models.create_model("musk_large_patch16_384")
@@ -465,7 +581,12 @@ def get_musk(ckpt_path: str):
         ]
     )
 
-    return model, transform
+    # Tokenizer
+    tokenizer = XLMRobertaTokenizer(
+        ckpt_path.replace("model.safetensors", "tokenizer.spm")
+    )
+
+    return model, transform, tokenizer
 
 
 def get_midnight(ckpt_path: str):

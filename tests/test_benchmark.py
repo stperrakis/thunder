@@ -43,13 +43,11 @@ def test_custom_model(temp_env_dir):
             )
             self.name = "dinov2_vits14"
             self.emb_dim = 384
+            self.vlm = False
 
         def forward(self, x):
             feats = self.dinov2.forward_features(x)
             return feats["x_norm_clstoken"]
-
-        def get_transform(self):
-            return self.t
 
         def get_transform(self):
             return self.t

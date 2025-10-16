@@ -3,6 +3,7 @@ import os
 import shutil
 from typing import Callable
 
+import h5py
 import hydra
 from omegaconf import DictConfig
 
@@ -29,7 +30,7 @@ def benchmark(
     where options are:
         - dataset: *bach*, *bracs*, *break_his*, *ccrcc*, *crc*, *esca*, *mhist*, *ocelot*, *pannuke*, *patch_camelyon*, *segpath_epithelial*, *segpath_lymphocytes*, *tcga_crc_msi*, *tcga_tils*, *tcga_uniform*, *wilds*
         - model: *hiboub*, *hiboul*, *hoptimus0*, *hoptimus1*, *midnight*, *phikon*, *phikon2*, *uni*, *uni2h*, *virchow*, *virchow2*, *conch*, *titan*, *keep*, *musk*, *plip*, *quiltnetb32*, *dinov2base*, *dinov2large*, *vitbasepatch16224in21k*, *vitlargepatch16224in21k*, *clipvitbasepatch32*, *clipvitlargepatch14*
-        - task: *adversarial_attack*, *alignment_scoring*, *image_retrieval*, *knn*, *linear_probing*, *pre_computing_embeddings*, *segmentation*, *simple_shot*, *transformation_invariance*
+        - task: *adversarial_attack*, *alignment_scoring*, *image_retrieval*, *knn*, *linear_probing*, *pre_computing_embeddings*, *segmentation*, *simple_shot*, *transformation_invariance*, *zero_shot_vlm*
         - loading_mode: *online_loading*, *image_pre_loading*, *embedding_pre_loading*
 
     Args:
@@ -111,13 +112,13 @@ def run_benchmark(cfg: DictConfig, model_cls: Callable = None) -> None:
     from .tasks.alignment_scoring import alignment_scoring
     from .tasks.image_retrieval import image_retrieval
     from .tasks.knn_classification import knn
-    from .tasks.pre_computing_patch_embeddings import \
-        pre_computing_patch_embeddings
+    from .tasks.pre_computing_patch_embeddings import pre_computing_patch_embeddings
     from .tasks.simple_shot import simple_shot
     from .tasks.train_eval_probe import eval_probe, train_probe
     from .tasks.transformation_invariance import transformation_invariance
+    from .tasks.zero_shot_vlm import zero_shot_vlm
     from .utils.constants import UtilsConstants
-    from .utils.data import get_data, load_embeddings
+    from .utils.data import get_data, h5_to_np, load_embeddings
     from .utils.dice_loss import multiclass_dice_loss
     from .utils.utils import set_seed
 
@@ -273,6 +274,7 @@ def run_benchmark(cfg: DictConfig, model_cls: Callable = None) -> None:
         "knn",
         "pre_computing_embeddings",
         "simple_shot",
+        "zero_shot_vlm",
     ]:
         embeddings_folder = os.path.join(
             base_embeddings_folder,
@@ -372,6 +374,29 @@ def run_benchmark(cfg: DictConfig, model_cls: Callable = None) -> None:
                     res_folder,
                     wandb_base_folder,
                 )
+        elif task_type == "zero_shot_vlm":
+            # Loading image-text embeddings
+            image_embs = h5_to_np(
+                h5py.File(
+                    os.path.join(
+                        embeddings_folder, "test", "text_aligned_embeddings.h5"
+                    )
+                )
+            )
+            text_embs = h5_to_np(
+                h5py.File(os.path.join(embeddings_folder, "test", "text_embeddings.h5"))
+            )
+            labels = h5_to_np(
+                h5py.File(os.path.join(embeddings_folder, "test", "labels.h5"))
+            )
+
+            zero_shot_vlm(
+                image_embs,
+                text_embs,
+                labels,
+                res_folder,
+                wandb_base_folder,
+            )
 
     if task_type == "transformation_invariance":
         transformation_invariance(

@@ -36,6 +36,7 @@ class DINOv2Features(PretrainedModel):
         )
         self.name = "dinov2_vits14"
         self.emb_dim = 384
+        self.vlm = False
 
     def forward(self, x):
         feats = self.dinov2.forward_features(x)
